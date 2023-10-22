@@ -44,15 +44,15 @@ int main () {
   int villagesNum, connectionsNum;
   int originVillage, destVillage, year, cost, time;
 
-  vector<vector<Connection>> connections;
+  vector<vector<Connection>> graph;
   Connection newConnection;
 
   vector<Village> villages;
 
   scanf("%d %d", &villagesNum, &connectionsNum);
 
-  connections.resize(connectionsNum);
   villages.resize(villagesNum);
+  graph.resize(villagesNum);
 
   for (int i = 0; i < connectionsNum; i++) {
     scanf("%d %d %d %d %d", &originVillage, &destVillage, &year, &time, &cost);
@@ -63,7 +63,11 @@ int main () {
     newConnection.time = time;
     newConnection.cost = cost;
 
-    connections[originVillage - 1].push_back(newConnection);
+    graph[originVillage - 1].push_back(newConnection);
+
+    newConnection.destVillage = originVillage - 1;
+
+    graph[destVillage - 1].push_back(newConnection);
   }
 
   // Dijkstra
@@ -79,17 +83,10 @@ int main () {
 
   priorityQueue.insert(0);
 
-  // cout << "\n\n";
-  // while (!pq.empty()) {
-  //     std::cout << pq.top() << " ";
-  //     pq.pop();
-  // }
-  //  cout << "\n\n";
-
   int u = find_min(villages);
    
   while (u != -1) {
-    vector<Connection> neighbourConnections = connections[u];
+    vector<Connection> neighbourConnections = graph[u];
 
     for (int i = 0; i < neighbourConnections.size(); i++) {
       int currentVillage = neighbourConnections[i].destVillage;
@@ -106,12 +103,12 @@ int main () {
     u = find_min(villages);
   }
 
-  for (int i = 0; i < connections.size(); i++) {
-    for(int j = 0; j < connections[i].size(); j++) {
-      cout << connections[i][j].destVillage << "\n";
-      cout << connections[i][j].year << "\n";
-      cout << connections[i][j].time << "\n";
-      cout << connections[i][j].cost << "\n";
+  for (int i = 0; i < graph.size(); i++) {
+    for(int j = 0; j < graph[i].size(); j++) {
+      cout << graph[i][j].destVillage << "\n";
+      cout << graph[i][j].year << "\n";
+      cout << graph[i][j].time << "\n";
+      cout << graph[i][j].cost << "\n";
       cout << "\n" << "\n";
     }
   }

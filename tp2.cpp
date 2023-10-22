@@ -130,7 +130,9 @@ int main () {
     }
 
     for (Connection connection: graph[connectionLowestYear.destVillage]) {
-      primYearQueue.push(connection);
+      if (villages[connection.destVillage].primYearVisited == false) {
+        primYearQueue.push(connection);
+      }
     }
   }
 
@@ -157,19 +159,11 @@ int main () {
     villages[connectionLowestCost.destVillage].primCostVisited = true;
 
     for (Connection connection: graph[connectionLowestCost.destVillage]) {
-      primCostQueue.push(connection);
+      if (villages[connection.destVillage].primCostVisited == false) {
+        primCostQueue.push(connection);
+      }
     }
   }
-
-  // for (int i = 0; i < graph.size(); i++) {
-  //   for(int j = 0; j < graph[i].size(); j++) {
-  //     cout << graph[i][j].destVillage << "\n";
-  //     cout << graph[i][j].year << "\n";
-  //     cout << graph[i][j].time << "\n";
-  //     cout << graph[i][j].cost << "\n";
-  //     cout << "\n" << "\n";
-  //   }
-  // }
 
   int firstYearOfCompleteConnections = 0;
 

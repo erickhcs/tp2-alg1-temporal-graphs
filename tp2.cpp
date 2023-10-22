@@ -12,7 +12,7 @@ struct Connection {
 
 struct Village {
   int dFromOrigin, year;
-  bool processed, visited;
+  bool processed, visited, primYearVisited, primCostVisited;
 };
 
 int find_min (vector<Village> villages) {
@@ -75,6 +75,8 @@ int main () {
   for (int i = 0; i < villages.size(); i++) {
     villages[i].processed = false;
     villages[i].visited = false;
+    villages[i].primYearVisited = false;
+    villages[i].primCostVisited = false;
   }
 
   villages[0].dFromOrigin = 0;
@@ -103,6 +105,62 @@ int main () {
     u = find_min(villages);
   }
 
+  // Prim Year
+  int lowestYear = 0;
+  auto compareYear = [](Connection a, Connection b) { return a.year > b.year; };
+    
+  priority_queue<int, vector<Connection>, decltype(compareYear)> primYearQueue(compareYear);
+
+  villages[0].primYearVisited = true;
+
+  for (Connection connection: graph[0]) {
+    primYearQueue.push(connection);
+  }
+
+  while (!primYearQueue.empty()) {
+    Connection connectionLowestYear = primYearQueue.top();
+    primYearQueue.pop();
+
+    if (villages[connectionLowestYear.destVillage].primYearVisited == true) continue;
+
+    villages[connectionLowestYear.destVillage].primYearVisited = true;
+    
+    if (connectionLowestYear.year > lowestYear) {
+      lowestYear = connectionLowestYear.year;
+    }
+
+    for (Connection connection: graph[connectionLowestYear.destVillage]) {
+      primYearQueue.push(connection);
+    }
+  }
+
+   // Prim Cost
+  int sumCost = 0;
+  auto compareCost = [](Connection a, Connection b) { return a.cost > b.cost; };
+    
+  priority_queue<int, vector<Connection>, decltype(compareCost)> primCostQueue(compareCost);
+
+  villages[0].primCostVisited = true;
+
+  for (Connection connection: graph[0]) {
+    primCostQueue.push(connection);
+  }
+
+  while (!primCostQueue.empty()) {
+    Connection connectionLowestCost = primCostQueue.top();
+    primCostQueue.pop();
+
+    if (villages[connectionLowestCost.destVillage].primCostVisited == true) continue;
+
+    sumCost += connectionLowestCost.cost;
+
+    villages[connectionLowestCost.destVillage].primCostVisited = true;
+
+    for (Connection connection: graph[connectionLowestCost.destVillage]) {
+      primCostQueue.push(connection);
+    }
+  }
+
   // for (int i = 0; i < graph.size(); i++) {
   //   for(int j = 0; j < graph[i].size(); j++) {
   //     cout << graph[i][j].destVillage << "\n";
@@ -124,6 +182,8 @@ int main () {
   }
 
   cout << firstYearOfCompleteConnections << "\n";
+  cout << lowestYear << "\n";
+  cout << sumCost << "\n";
 
   return 0;
 }

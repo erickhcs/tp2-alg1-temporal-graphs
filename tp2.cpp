@@ -10,7 +10,8 @@ struct Connection {
 };
 
 struct Village {
-  int dFromOrigin, year, villageIndex;
+  long int dFromOrigin;
+  int year, villageIndex;
   bool primYearVisited, primCostVisited;
 };
 
@@ -45,12 +46,12 @@ int main () {
   }
 
   // Dijkstra
-  auto compareDistance = [](Village a, Village b) { return a.year > b.year; };
+  auto compareDistance = [](Village a, Village b) { return a.dFromOrigin > b.dFromOrigin; };
     
   priority_queue<int, vector<Village>, decltype(compareDistance)> djQueue(compareDistance);
 
   for (int i = 0; i < villages.size(); i++) {
-    villages[i].dFromOrigin = INT_MAX;
+    villages[i].dFromOrigin = LONG_MAX;
     villages[i].villageIndex = i;
     villages[i].primYearVisited = false;
     villages[i].primCostVisited = false;
@@ -62,7 +63,7 @@ int main () {
   while (!djQueue.empty()) {
     Village currentVillage = djQueue.top();
     int v = currentVillage.villageIndex;
-    int w = currentVillage.dFromOrigin;
+    long int w = currentVillage.dFromOrigin;
 
     djQueue.pop();
 
@@ -80,7 +81,6 @@ int main () {
         villages[u].year = year;
         djQueue.push(villages[u]);
       }
-      
     }
   }
 
@@ -116,7 +116,7 @@ int main () {
   }
 
    // Prim Cost
-  int sumCost = 0;
+  long int sumCost = 0;
   auto compareCost = [](Connection a, Connection b) { return a.cost > b.cost; };
     
   priority_queue<int, vector<Connection>, decltype(compareCost)> primCostQueue(compareCost);

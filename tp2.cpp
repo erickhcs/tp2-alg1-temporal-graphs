@@ -1,8 +1,7 @@
 #include <iostream>
 #include <vector>
-#include <limits>
+#include <limits.h>
 #include <queue>
-#include <set>
 
 using namespace std;
 
@@ -11,33 +10,9 @@ struct Connection {
 };
 
 struct Village {
-  int dFromOrigin, year;
-  bool processed, visited, primYearVisited, primCostVisited;
+  int dFromOrigin, year, villageIndex;
+  bool primYearVisited, primCostVisited;
 };
-
-int find_min (vector<Village> villages) {
-  auto lowestCost = numeric_limits<unsigned>::max();
-  int lowestCostNode;
-
-  for (int i = 0; i < villages.size(); i++) {
-    Village currentVillage = villages[i];
-
-    bool isNotProcessed = !currentVillage.processed;
-    bool isVisited = currentVillage.visited;
-    
-    if (isVisited && isNotProcessed && currentVillage.dFromOrigin < lowestCost)
-    {
-      lowestCost = currentVillage.dFromOrigin;
-      lowestCostNode = i;
-    }
-  }
-
-  if (lowestCost == numeric_limits<unsigned>::max()) {
-    return -1;
-  }
-
-  return lowestCostNode;
-}
 
 int main () {
   int villagesNum, connectionsNum;
@@ -70,39 +45,43 @@ int main () {
   }
 
   // Dijkstra
-  set<int> priorityQueue;
+  auto compareDistance = [](Village a, Village b) { return a.year > b.year; };
+    
+  priority_queue<int, vector<Village>, decltype(compareDistance)> djQueue(compareDistance);
 
   for (int i = 0; i < villages.size(); i++) {
-    villages[i].processed = false;
-    villages[i].visited = false;
+    villages[i].dFromOrigin = INT_MAX;
+    villages[i].villageIndex = i;
     villages[i].primYearVisited = false;
     villages[i].primCostVisited = false;
   }
 
   villages[0].dFromOrigin = 0;
-  villages[0].visited = true;
+  djQueue.push(villages[0]);
 
-  priorityQueue.insert(0);
+  while (!djQueue.empty()) {
+    Village currentVillage = djQueue.top();
+    int v = currentVillage.villageIndex;
+    int w = currentVillage.dFromOrigin;
 
-  int u = find_min(villages);
-   
-  while (u != -1) {
-    vector<Connection> neighbourConnections = graph[u];
+    djQueue.pop();
 
-    for (int i = 0; i < neighbourConnections.size(); i++) {
-      int currentVillage = neighbourConnections[i].destVillage;
-      int dNeighbour = neighbourConnections[i].time;
+    if (w != villages[v].dFromOrigin) continue;
 
-      if (!villages[currentVillage].visited || villages[currentVillage].dFromOrigin > villages[u].dFromOrigin + dNeighbour) {
-        villages[currentVillage].dFromOrigin = villages[u].dFromOrigin + dNeighbour;
-        villages[currentVillage].visited = true;
-        villages[currentVillage].year = neighbourConnections[i].year;
+    for (int i = 0; i < graph[v].size(); i++) {
+      Connection currentConnection = graph[v][i];
+
+      int u = currentConnection.destVillage;
+      int cost = currentConnection.time;
+      int year = currentConnection.year;
+
+      if (villages[u].dFromOrigin > villages[v].dFromOrigin + cost) {
+        villages[u].dFromOrigin = villages[v].dFromOrigin + cost;
+        villages[u].year = year;
+        djQueue.push(villages[u]);
       }
+      
     }
-
-    villages[u].processed = true;
-
-    u = find_min(villages);
   }
 
   // Prim Year

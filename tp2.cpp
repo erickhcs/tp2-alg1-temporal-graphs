@@ -11,9 +11,8 @@ struct Connection {
 };
 
 struct Village {
-  int dFromOrigin;
-  bool processed;
-  bool visited;
+  int dFromOrigin, year;
+  bool processed, visited;
 };
 
 int find_min (vector<Village> villages) {
@@ -95,6 +94,7 @@ int main () {
       if (!villages[currentVillage].visited || villages[currentVillage].dFromOrigin > villages[u].dFromOrigin + dNeighbour) {
         villages[currentVillage].dFromOrigin = villages[u].dFromOrigin + dNeighbour;
         villages[currentVillage].visited = true;
+        villages[currentVillage].year = neighbourConnections[i].year;
       }
     }
 
@@ -103,19 +103,27 @@ int main () {
     u = find_min(villages);
   }
 
-  for (int i = 0; i < graph.size(); i++) {
-    for(int j = 0; j < graph[i].size(); j++) {
-      cout << graph[i][j].destVillage << "\n";
-      cout << graph[i][j].year << "\n";
-      cout << graph[i][j].time << "\n";
-      cout << graph[i][j].cost << "\n";
-      cout << "\n" << "\n";
-    }
-  }
+  // for (int i = 0; i < graph.size(); i++) {
+  //   for(int j = 0; j < graph[i].size(); j++) {
+  //     cout << graph[i][j].destVillage << "\n";
+  //     cout << graph[i][j].year << "\n";
+  //     cout << graph[i][j].time << "\n";
+  //     cout << graph[i][j].cost << "\n";
+  //     cout << "\n" << "\n";
+  //   }
+  // }
+
+  int firstYearOfCompleteConnections = 0;
 
   for (int i = 0; i < villages.size(); i++) {
+    if (villages[i].year > firstYearOfCompleteConnections) {
+      firstYearOfCompleteConnections = villages[i].year;
+    }
+
     cout << villages[i].dFromOrigin << "\n";
   }
+
+  cout << firstYearOfCompleteConnections << "\n";
 
   return 0;
 }
